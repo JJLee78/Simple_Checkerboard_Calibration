@@ -115,6 +115,7 @@ int main()
             waitKey(0);
         }
             
+
         //cout << "aft corner11 xy : " << corners[11].x << " " << corners[11].y << endl;
         
         imgPoints.push_back(corners);
