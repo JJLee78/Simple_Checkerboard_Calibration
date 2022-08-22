@@ -143,21 +143,18 @@ int main()
             vector<Point2f> corners_rotated;
 
             vector<cv::Point3f> xyz;
-            xyz.push_back(Point3f(3, 0, 0));
-            xyz.push_back(Point3f(0, 3, 0));
-            xyz.push_back(Point3f(0, 0, -3));
+            xyz.push_back(Point3f(30, 0, 0));
+            xyz.push_back(Point3f(0, 30, 0));
+            xyz.push_back(Point3f(0, 0, 30));
 
             projectPoints(xyz, rvec, tvec, camIntrinsic, camDistort, corners_rotated);
             cout << "----#2----" << endl;
-            line(srcImg[i], corners_rotated[0], corners_rotated[0], Scalar(0, 0, 255), 5);
-            line(srcImg[i], corners_rotated[0], corners_rotated[1], Scalar(255, 0, 0), 5);
-            line(srcImg[i], corners_rotated[0], corners_rotated[2], Scalar(0, 255, 0), 5);
+            line(srcImg[i], corners[0], corners_rotated[0], Scalar(0, 0, 255), 5);
+            line(srcImg[i], corners[0], corners_rotated[1], Scalar(255, 0, 0), 5);
+            line(srcImg[i], corners[0], corners_rotated[2], Scalar(0, 255, 0), 5);
             cout << "#3" << endl;
 
-
-            projectPoints(objPoints[0], rvec, tvec, camIntrinsic, camDistort, corners_rotated);
-            cout << "----#2----" << endl;
-            line(srcImg[i], corners_rotated[0], corners_rotated[1], Scalar(0, 0, 255), 5);
+          //  line(srcImg[i], corners_rotated[0], corners_rotated[1], Scalar(0, 0, 255), 5);
             cout << "#3" << endl;
             /*cv::VideoCapture Capture;
             Capture.open(0);
