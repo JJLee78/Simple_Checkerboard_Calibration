@@ -3,7 +3,6 @@
 #include <string>
 #include <sstream>
 #include <wtypes.h>
-//#include <iomanip>
 
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp>
@@ -98,9 +97,7 @@ int main()
 
         // calculate subpixel of corners with criteria
         cornerSubPix(src_gray, corners, Size(10, 10), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.001)); 
-     //   line(srcImg[i], corners[0], corners[1], Scalar(0, 0, 255), 5, 0);
-      //  line(srcImg[i], corners[0], corners[2], Scalar(255, 0, 0), 5, 0);
-      //  line(srcImg[i], corners[0], corners[3], Scalar(0, 255, 0), 5, 0);
+
         if (i == patternNum - 1) // show the result of calibration(only last image)
         {
             drawChessboardCorners(srcImg[i], pattern_size, corners, isCalibrated);
@@ -111,13 +108,7 @@ int main()
                 resize(srcImg[i], showingMat, Size(srcImg[i].cols / 2, srcImg[i].rows / 2));
             else
                 showingMat = srcImg[i];
-        
-          //  imshow("Calibrating..", showingMat);
-         //   moveWindow("Calibrating..", 10, 10);
-           // waitKey(0);
         }
-
-        //cout << "aft corner11 xy : " << corners[11].x << " " << corners[11].y << endl;
         
         imgPoints.push_back(corners);
         if (i == patternNum - 1) // show the result of calibration(only last image)
@@ -132,14 +123,29 @@ int main()
             cout << "Lens distortion coefficients :" << endl;
             cout << camDistort << endl;
             cout << "Camera extrinsic parameters :" << endl;
-            cout << "----#0----" << endl;
+            //cout << camRotVec.back() << endl;
+            //cout << camTransVec.back() << endl;
+            for (auto& camRotVecMem : camRotVec)
+            {
+                cout << camRotVecMem << endl;
+                cout << "### next phase ###" << endl;
+            }
+            for (auto& camTransVecMem: camTransVec)
+            {
+                cout << camTransVecMem << endl;
+                cout << "### next phase ###" << endl;
+            }
+
             vector<vector<Point3f>> rVec;
             vector<vector<Point3f>> tVec;
             cv::Mat rvec(3, 1, CV_64FC1);
             cv::Mat tvec(3, 1, CV_64FC1);
+            
+            Mat undistortedImg;
+            undistort(srcImg[i], undistortedImg, camIntrinsic, camDistort);
+            //Mat undistortedImg = getOptimalNewCameraMatrix(srcImg[i], camDistort, cv::Size(srcImg[i].cols, srcImg[i].rows), 1, cv::Size(srcImg[i].cols, srcImg[i].rows));
 
             solvePnPRansac(objPoints[i], corners, camIntrinsic, camDistort, rvec, tvec);
-            cout << "----#1----" << endl;
             vector<Point2f> corners_rotated;
 
             vector<cv::Point3f> xyz;
@@ -148,50 +154,58 @@ int main()
             xyz.push_back(Point3f(0, 0, 30));
 
             projectPoints(xyz, rvec, tvec, camIntrinsic, camDistort, corners_rotated);
-            cout << "----#2----" << endl;
             line(srcImg[i], corners[0], corners_rotated[0], Scalar(0, 0, 255), 5);
             line(srcImg[i], corners[0], corners_rotated[1], Scalar(255, 0, 0), 5);
             line(srcImg[i], corners[0], corners_rotated[2], Scalar(0, 255, 0), 5);
-            cout << "#3" << endl;
 
-          //  line(srcImg[i], corners_rotated[0], corners_rotated[1], Scalar(0, 0, 255), 5);
-            cout << "#3" << endl;
-            /*cv::VideoCapture Capture;
+            imshow("rotated", srcImg[i]);
+            moveWindow("rotated", 10, 10);
+            imshow("undistorted", undistortedImg);
+            waitKey(0);
+ 
+
+            cv::VideoCapture Capture;
             Capture.open(0);
             Capture.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
             Capture.set(CV_CAP_PROP_FRAME_WIDTH, 1920);
             Capture.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
             Mat showing;
+            // # Drawing X,Y,Z axis of first corner (0, 0, 0)
+            bool isKeyInput = false;
             while (Capture.read(showing))
             {
+                Mat grayimg = showing;
+                cvtColor(grayimg, src_gray, COLOR_BGR2GRAY);
+
+
+                //int keyinput_temp = waitKey(1);
+                //if (keyinput_temp == 13)
+                //{
+                //    if (isKeyInput == true)
+                //        isKeyInput = false;
+                //    else
+                //        isKeyInput = true;
+                //}
+                    
+
+              //  if (isKeyInput)
+                {
+                    if (findChessboardCorners(grayimg, pattern_size, corners))
+                    {
+                        solvePnPRansac(objPoints[i], corners, camIntrinsic, camDistort, rvec, tvec);
+                        projectPoints(xyz, rvec, tvec, camIntrinsic, camDistort, corners_rotated);
+                        line(showing, corners[0], corners_rotated[0], Scalar(0, 0, 255), 5);
+                        line(showing, corners[0], corners_rotated[1], Scalar(255, 0, 0), 5);
+                        line(showing, corners[0], corners_rotated[2], Scalar(0, 255, 0), 5);
+                    }
+                }
                 imshow("video", showing);
                 waitKey(1);
-            }*/
-            imshow("rotated", srcImg[i]);
-            moveWindow("rotated", 10, 10);
-            waitKey(0);
+            }
 
         }
     }
     destroyWindow("Calibrating..");
-
-    if (found_num != patternNum)
-    {
-        cerr << "Calibration Images are insufficient." << endl;
-        return -1;
-    }
-
-
-    //line(srcImg[9], corners[0], corners[2], Scalar(255, 0, 0), 5, 0);
-    //line(srcImg[9], corners[0], corners[3], Scalar(0, 255, 0), 5, 0);
-
-        //imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
-  /*  for (Mat& rottemp : camRotVec)
-        cout << rottemp;
-    cout << endl;
-    for (Mat& transtemp : camTransVec)
-        cout << transtemp;
-    cout << endl;*/
 
     return 0;
 }
