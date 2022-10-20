@@ -1,0 +1,2 @@
+﻿  Simple_Checkerboard_Calibration.cpp
+C:\Users\JaejunLee\source\repos\Simple_Checkerboard_Calibration\Simple_Checkerboard_Calibration\Simple_Checkerboard_Calibration.cpp(5,10): fatal error C1083: 포함 파일을 열 수 없습니다. 'opencv.hpp': No such file or directory

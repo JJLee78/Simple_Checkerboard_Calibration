@@ -36,7 +36,7 @@ int main()
     int boardRows = 0;
     int boardCols = 0;
     float boardSize = 0;
-
+    
     vector<Mat> srcImg;
     vector<vector<Point2f>> imgPoints;
     while (boardRows < 5 && boardCols < 5 && boardSize <= 10.0)
@@ -138,13 +138,15 @@ int main()
 
             vector<vector<Point3f>> rVec;
             vector<vector<Point3f>> tVec;
-            cv::Mat rvec(3, 1, CV_64FC1);
-            cv::Mat tvec(3, 1, CV_64FC1);
+            cv::Mat rvec(3, 1, CV_64FC2);
+            cv::Mat tvec(3, 1, CV_64FC2);
             
             Mat undistortedImg;
-            undistort(srcImg[i], undistortedImg, camIntrinsic, camDistort);
+            undistortPoints(rvec, tvec, camIntrinsic, camDistort, NULL, NULL);
             //Mat undistortedImg = getOptimalNewCameraMatrix(srcImg[i], camDistort, cv::Size(srcImg[i].cols, srcImg[i].rows), 1, cv::Size(srcImg[i].cols, srcImg[i].rows));
 
+            cout << "keyyathow" << endl;
+            cv::waitKey(6000);
             solvePnPRansac(objPoints[i], corners, camIntrinsic, camDistort, rvec, tvec);
             vector<Point2f> corners_rotated;
 
